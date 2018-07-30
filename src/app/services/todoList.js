@@ -8,26 +8,7 @@ export default class TodoList {
     this.filteredList = this.list = [];
     this.db = $webSql.openDatabase('Mesh01', '1.0', 'Mesh01', 2 * 1024 * 1024);
     // this.db.dropTable('list');
-    this.db.createTable('list', {
-      "id": {
-        "type": "TEXT",
-        "null": "NOT NULL", // default is "NULL" (if not defined)
-        "primary": true, // primary
-      },
-      "created": {
-        "type": "TIMESTAMP",
-        "null": "NOT NULL",
-        "default": "CURRENT_TIMESTAMP" // default value
-      },
-      "description": {
-        "type": "TEXT",
-        "null": "NOT NULL"
-      },
-      "isCompleted": {
-        "type": "TEXT",
-        "null": "NOT NULL"
-      }
-    })
+    this.createTable();
 
     // this.db.bulkInsert('todos', this.todoList).then(function(results) {
     //   console.log(results.insertId);
@@ -66,19 +47,51 @@ export default class TodoList {
     this.$filter();
   }
 
+  createTable() {
+    this.db.createTable('list', {
+      "id": {
+        "type": "TEXT",
+        "null": "NOT NULL", // default is "NULL" (if not defined)
+        "primary": true, // primary
+      },
+      "created": {
+        "type": "TIMESTAMP",
+        "null": "NOT NULL",
+        "default": "CURRENT_TIMESTAMP" // default value
+      },
+      "description": {
+        "type": "TEXT",
+        "null": "NOT NULL"
+      },
+      "isCompleted": {
+        "type": "TEXT",
+        "null": "NOT NULL"
+      }
+    })
+  }
+
   toggleStatus(task) {
     task.complete = !task.complete;
+    this.db.del("list", {
+      "id": item.id,
+      'complete': task.complete
+    })
     this.$filter();
   }
 
   remove(item) {
     this.list = this.list.filter((todo) => todo !== item);
-    this.db.del("list", {"id": item.id})
+    this.db.del("list", {
+      "id": item.id
+    })
     this.$filter();
   }
 
   clearCompleted() {
     this.list = this.list.filter((todo) => !todo.complete);
+    this.db.dropTable('list');
+    this.list = [];
+    this.createTable();
     this.$filter();
   }
 
