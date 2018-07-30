@@ -1,9 +1,9 @@
-
 export class TodoItemController {
   constructor(todoList) {
     "ngInject";
     this.todoList = todoList;
     this.isEditing = false;
+    this.selected = null;
   }
 
   onDestroyClick() {
@@ -22,6 +22,10 @@ export class TodoItemController {
 
   toggleStatus() {
     this.todoList.toggleStatus(this.task);
+  }
+
+  moved($index){
+    this.list.splice($index, 1);
   }
 
   /**
@@ -44,10 +48,18 @@ export class TodoItemController {
 
 export default {
   bindings: {
-    task: '=todo'
+    task: '=todo',
+    list: '=items',
+    index: '=index',
+    selected: '=selected'
   },
   template: `
-    <li ng-class="{'completed': vm.task.complete, 'editing': vm.isEditing}">
+    <li
+    dnd-draggable="vm.task"
+    dnd-effect-allowed="move"
+    dnd-selected="vm.selected = vm.task"
+    dnd-moved="vm.moved(vm.index, 1)"
+          ng-class="{'completed': vm.task.complete, 'editing': vm.isEditing, 'selected': models.selected === vm.task}">
       <div class="view" ng-show="!vm.isEditing">
         <input
           class="toggle"

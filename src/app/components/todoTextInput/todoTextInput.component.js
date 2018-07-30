@@ -3,14 +3,28 @@ import './todoTextInput.less';
 class TodoTextInputController {
   constructor() {
     this.text = this.value || '';
+    this.isValidItem = true;
   }
 
-  save() {
-    this.onSave({
-      task: this.text
-    });
+  change(event) {
+    if (this.text.length > 24) {
+      this.isValidItem = false;
+      alert("Maximun item length its exeded")
+    } else {
+      this.isValidItem = true;
+    }
+  };
 
-    this.text = '';
+  save() {
+    if (this.isValidItem) {
+      this.onSave({
+        task: this.text
+      });
+
+      this.text = '';
+    } else {
+      alert("Maximun characters are exeded")
+    }
   }
 
   onEscape() {
@@ -31,6 +45,7 @@ export default {
       <input class="new-todo" autofocus=""
              on-escape="vm.onEscape()"
              ng-model="vm.text"
+             ng-change="vm.change($event)"
              placeholder="{{vm.placeholder}}" />
     </form>
   `,
